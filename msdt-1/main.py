@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-
+from constants import CSV_PATH
 
 def main():
-	data = pd.read_csv("c:/users/henry/desktop/datasets/b_cancer.csv")  #loads dataset
+	data = pd.read_csv(CSV_PATH)  #loads dataset
 	lb = LabelEncoder()    #instantiate the LabelEncoder class
 	x = data.iloc[:,2:32].values
 	y = data["diagnosis"].values
