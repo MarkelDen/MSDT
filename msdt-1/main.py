@@ -29,8 +29,11 @@ def main() -> None:
     learning_rate = 1e-3
     print(f"learning_rate for training is {learning_rate}")
     print(y_test)
-    parameters = network_model(x_train, y_train, x_test, y_test, learning_rate=learning_rate, epochs=10000,
-                               layer_dims=layer_dims, lambd=0.0, learning_decay=0.00000001, p_keep=1.0, beta=0.9, optimizer="gradient descent")
+    parameters = network_model(x_train, y_train, x_test, y_test, 
+			       learning_rate=learning_rate, epochs=10000,
+                               layer_dims=layer_dims, lambd=0.0, 
+			       learning_decay=0.00000001, p_keep=1.0, beta=0.9, 
+			       optimizer="gradient descent")
     train_predictions = predict(x_train, parameters)
     predictions = predict(x_test, parameters)
     print(train_predictions)
@@ -53,7 +56,8 @@ def initialize_parameters(layer_dims): List[int]) -> Dict[str, np.ndarray]:
         parameters[f"b{l}"] = np.zeros((layer_dims[l], 1))
     return parameters
 
-def linear_forward(A: np.ndarray, W: np.ndarray, b: np.ndarray) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+def linear_forward(A: np.ndarray, W: np.ndarray, b: np.ndarray
+		  ) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
     """
     Performs the linear part of a layer's forward propagation.
     """
@@ -85,7 +89,8 @@ def leaky_relu(Z: np.ndarray, alpha: float) -> Tuple[np.ndarray, np.ndarray]:
     cache = Z
     return s,cache
 
-def linear_activation_forward(A_prev: np.ndarray, W: np.ndarray, b: np.ndarray, activation: str) -> Tuple[np.ndarray, Tuple[Any, Any]]:
+def linear_activation_forward(A_prev: np.ndarray, W: np.ndarray, b: np.ndarray, 
+			      activation: str) -> Tuple[np.ndarray, Tuple[Any, Any]]:
     """
     Performs the forward propagation for a single layer.
     """
@@ -99,7 +104,9 @@ def linear_activation_forward(A_prev: np.ndarray, W: np.ndarray, b: np.ndarray, 
     cache = (linear_cache, activation_cache)
     return A, cache
 
-def L_model_forward(X: np.ndarray, parameters: Dict[str, np.ndarray], p_keep: float = 1.0) -> Tuple[np.ndarray, List[Any], Dict[str, np.ndarray]]:
+def L_model_forward(X: np.ndarray, parameters: Dict[str, np.ndarray], 
+		    p_keep: float = 1.0
+		    ) -> Tuple[np.ndarray, List[Any], Dict[str, np.ndarray]]:
     """
     Implements forward propagation for the entire network.
     """
@@ -139,7 +146,8 @@ def sigmoid_backward(dA: np.ndarray, Z: np.ndarray) -> np.ndarray:
     dZ = dA * derivative
     return dZ
 
-def linear_backward(dZ: np.ndarray, cache: Tuple[np.ndarray, np.ndarray, np.ndarray], lambd: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def linear_backward(dZ: np.ndarray, cache: Tuple[np.ndarray, np.ndarray, np.ndarray], 
+		    lambd: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Performs backward propagation for the linear portion of a layer.
     """
@@ -152,7 +160,9 @@ def linear_backward(dZ: np.ndarray, cache: Tuple[np.ndarray, np.ndarray, np.ndar
     dA_prev = np.dot(W.T, dZ)
     return dW, db, dA_prev
 
-def linear_backward_activation(dA: np.ndarray, cache: Tuple[Any, Any], activation: str, lambd: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def linear_backward_activation(dA: np.ndarray, cache: Tuple[Any, Any], activation: str, 
+			       lambd: float
+			       ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Performs backward propagation for a single layer with activation.
     """
@@ -168,7 +178,9 @@ def linear_backward_activation(dA: np.ndarray, cache: Tuple[Any, Any], activatio
         dW, db, dA_prev = linear_backward(dZ, cache, lambd)
     return dW, db, dA_prev
 
-def l_model_backward(AL: np.ndarray, Y: np.ndarray, cache: List[Any], lambd: float, dropout_dict: Dict[str, np.ndarray], p_keep: float) -> Dict[str, np.ndarray]:
+def l_model_backward(AL: np.ndarray, Y: np.ndarray, cache: List[Any], lambd: float, 
+		     dropout_dict: Dict[str, np.ndarray], p_keep: float
+		    ) -> Dict[str, np.ndarray]:
     """
     Implements backward propagation for the entire network.
     """
@@ -178,13 +190,15 @@ def l_model_backward(AL: np.ndarray, Y: np.ndarray, cache: List[Any], lambd: flo
     current_cache = cache[-1]
     L = len(cache)
     grads[f"dW{L}"], grads[f"db{L}"], grads[f"dA{
-        L - 1}"] = linear_backward_activation(dAL, current_cache, activation="sigmoid", lambd=0.0)
+        L - 1}"] = linear_backward_activation(dAL, current_cache, activation="sigmoid", 
+					      lambd=0.0)
     grads[f"dA{L - 1}"] = grads[f"dA{L - 1}"] * dropout_dict[f"D{L - 1}"]
     grads[f"dA{L - 1}"] /= p_keep
     for i in reversed(range(L-1)):
         current_cache = cache[i]
-        grads[f"dW{i+1}"], grads[f"db{i + 1}"], grads[f"dA{i}"] = linear_backward_activation(
-            grads[f"dA{i+1}"], current_cache, activation="relu", lambd=0.0)
+        grads[f"dW{i+1}"], grads[f"db{i + 1}"], grads[f"dA{
+	    i}"] = linear_backward_activation(grads[f"dA{i+1}"], current_cache, 
+					      activation="relu", lambd=0.0)
         if i == 0:
             break
         else:
@@ -192,7 +206,8 @@ def l_model_backward(AL: np.ndarray, Y: np.ndarray, cache: List[Any], lambd: flo
             grads[f"dA{i}"] /= p_keep
     return grads
 
-def update_parameters(parameters: Dict[str, np.ndarray], grads: Dict[str, np.ndarray], learning_rate: float) -> Dict[str, np.ndarray]:
+def update_parameters(parameters: Dict[str, np.ndarray], grads: Dict[str, np.ndarray], 
+		      learning_rate: float) -> Dict[str, np.ndarray]:
     """
     Updates parameters using gradient descent.
     """
@@ -247,7 +262,8 @@ def calc_norm(weight: List[np.ndarray]) -> float:
         norm += np.sum(np.square(weight[i]))
     return norm
 
-def random_mini_batches(X: np.ndarray, Y: np.ndarray, mini_batch_size: int, seed: int = 0) -> List[Tuple[np.ndarray, np.ndarray]]:
+def random_mini_batches(X: np.ndarray, Y: np.ndarray, mini_batch_size: int, 
+			seed: int = 0) -> List[Tuple[np.ndarray, np.ndarray]]:
     """
     Creates random mini-batches from the dataset.
     """
@@ -341,7 +357,8 @@ def update_rmsprop(s: Dict[str, np.ndarray],
                 s_corrected[f"db{l+1}"] + epsilon))
     return params, s_corrected
 
-def initialize_adam(params: Dict[str, np.ndarray]) -> Tuple[Dict[str, np.ndarray], Dict[str, np.ndarray]]:
+def initialize_adam(params: Dict[str, np.ndarray]) -> Tuple[Dict[str, np.ndarray], 
+		    Dict[str, np.ndarray]]:
     """
     Initializes the Adam optimization variables (v and s) for all layers.
     """
@@ -388,7 +405,8 @@ def update_adam(params: Dict[str, np.ndarray],
                       np.sqrt(s_corrected[f"db{l+1}"]+epsilon))
     return params, s_corrected, v_corrected
 
-def compute_cost(AL: np.ndarray, Y: np.ndarray, lambd: float, parameters: Dict[str, np.ndarray]) -> float:
+def compute_cost(AL: np.ndarray, Y: np.ndarray, lambd: float, 
+		 parameters: Dict[str, np.ndarray]) -> float:
     """
     Computes the cost function with optional L2 regularization.
     """
